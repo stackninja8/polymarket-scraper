@@ -56,6 +56,48 @@ A Rust service that detects new prediction markets from Polymarket, stores them 
 
 The database will be created automatically on first run, and migrations will be applied.
 
+### Adding New Migrations
+
+This project uses `sqlx` migrations. To add a new migration:
+
+**Option 1: Using sqlx-cli (recommended)**
+1. Install sqlx-cli (if not already installed):
+   ```bash
+   cargo install sqlx-cli --no-default-features --features sqlite
+   ```
+
+2. Create a new migration:
+   ```bash
+   sqlx migrate add <migration_name>
+   ```
+   For example:
+   ```bash
+   sqlx migrate add add_user_preferences
+   ```
+   This creates a new file in `migrations/` with a timestamp prefix (e.g., `002_add_user_preferences.sql`).
+
+**Option 2: Manual creation**
+1. Create a new file in `migrations/` directory following the naming pattern:
+   ```
+   migrations/002_<migration_name>.sql
+   ```
+   The number should be sequential (002, 003, 004, etc.).
+
+2. Add your SQL to the file:
+   ```sql
+   -- migrations/002_add_user_preferences.sql
+   ALTER TABLE markets ADD COLUMN user_notes TEXT;
+   ```
+
+**Applying Migrations**
+- Migrations run **automatically** when the application starts (see `src/db.rs`).
+- Or apply manually (requires sqlx-cli):
+  ```bash
+  sqlx migrate run
+  ```
+
+**Note**: Migrations are applied automatically on startup. The application checks for pending migrations and applies them before starting the scraper and API server.
+
 ## Usage
 
 ### Service Endpoints
